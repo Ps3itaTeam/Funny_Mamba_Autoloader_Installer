@@ -26,9 +26,9 @@
 
 #define PATH_SYS_INI_OSD 		"/dev_blind/sys/internal/sys_init_osd.self"
 #define PATH_SYS_INI_OSD_ORIG 	"/dev_blind/sys/internal/sys_init_osd_orig.self"
-#define PATH_SYS_INI_OSD_NEW 	"/dev_hdd0/game/MAMBAPRXL/USRDIR/NewCore/sys_init_osd.self"
-#define PATH_DIR_PAYLOAD 		"/dev_hdd0/game/MAMBAPRXL/USRDIR/payloads/"
-#define PATH_DIR_PS2EMU_NEW		"/dev_hdd0/game/MAMBAPRXL/USRDIR/ps2emu/"
+#define PATH_SYS_INI_OSD_NEW 	"/dev_hdd0/game/MAMBAINST/USRDIR/NewCore/sys_init_osd.self"
+#define PATH_DIR_PAYLOAD 		"/dev_hdd0/game/MAMBAINST/USRDIR/payloads/"
+#define PATH_DIR_PS2EMU_NEW		"/dev_hdd0/game/MAMBAINST/USRDIR/ps2emu/"
 #define	VSH_PLUGINS_PATH_MAMBA	"/dev_hdd0/mamba_plugins.txt"
 #define	VSH_PLUGINS_PATH_PRX	"/dev_hdd0/prx_plugins.txt"
 
