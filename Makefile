@@ -22,7 +22,7 @@ DATA		:=	data
 INCLUDES	:=	include
 PKGFILES	:=	$(CURDIR)/pkgfiles
 
-TITLE		:=	Funny Mamba Autoloader Installer v1.01
+TITLE		:=	Funny Mamba Autoloader Installer v1.02
 APPID		:=	MAMBAINST
 CONTENTID	:=	EP0001-$(APPID)_00-0000000000000000
 
