@@ -1,7 +1,8 @@
 /*
 	==============================================================
 
-	MAMBA/PRX Autoloader By NzV
+	Unofficial MAMBA/PRX Autoloader by Ps3ita Team
+	Original author NzV
 
 	Load of MAMBA and/or VSH plugins (with MAMBA or PRX Loader) at system boot.
 
@@ -18,7 +19,7 @@
 
 #define SC_FS_MOUNT  		(837)
 
-#define VERSION_NAME 	"Unofficial MAMBA/PRX Autoloader v3.0.0 (forked from NzV)\r\n"
+#define VERSION_NAME 	"Unofficial MAMBA/PRX Autoloader v3.1.0 (forked from NzV)\r\n"
 
 //----------------------------------------
 //MAMBA/PRX AUTOLOADER
@@ -224,13 +225,18 @@ int is_mamba_installed()
 
 int run_uninstall_autoloader()
 {
+	char filename[128];
+	int fw_list[33] = { 0x355C,0x421C,0x430C,0x431C,0x440C,0x441C,0x446C,0x450C,0x453C,0x455C,0x460C,0x465C,0x466C,0x470C,0x475C,0x476C,0x478C,
+						0x355D,0x421D,0x430D,               0x441D,0x446D,0x450D,0x453D,0x455D,0x460D,0x465D,0x466D,0x470D,0x475D,0x476D,0x478D };
+	int i;	
+	
 	n += sprintf(&buf[n], "[UNINSTALLER]\r\n");
 	
 	//Check if installed
 	if(file_exists("/dev_flash/sys/internal/sys_init_osd_orig.self") != SUCCESS)
 	{
 		n += sprintf(&buf[n], "sys_init_osd_orig.self not found\r\n");
-		return FAILED;
+		goto residual;
 	}
 	//Remove flags
 	if(file_exists("/dev_hdd0/tmp/core_flags/nousb") == SUCCESS)
@@ -290,28 +296,6 @@ int run_uninstall_autoloader()
 		{
 			unlink_secure(PATH_SYS_INI_OSD);
 			sysLv2FsRename(PATH_SYS_INI_OSD_ORIG, PATH_SYS_INI_OSD);
-			//Remove payload
-			char filename[128];
-			int fw_list[33] = { 0x355C,0x421C,0x430C,0x431C,0x440C,0x441C,0x446C,0x450C,0x453C,0x455C,0x460C,0x465C,0x466C,0x470C,0x475C,0x476C,0x478C,
-									0x355D,0x421D,0x430D,               0x441D,0x446D,0x450D,0x453D,0x455D,0x460D,0x465D,0x466D,0x470D,0x475D,0x476D,0x478D};
-			int i;
-			for (i = 0; i < 33; i++)
-			{
-				if (fw_list[i] == 0) break;
-				sprintf (filename, "/dev_blind/sys/internal/mpl_payload_%X.bin", fw_list[i]);
-				if (file_exists(filename) == SUCCESS) unlink_secure(filename);
-				sprintf (filename, "/dev_blind/sys/internal/mamba_%X.bin", fw_list[i]);
-				if (file_exists(filename) == SUCCESS) unlink_secure(filename);
-				//Remove residual ps2emu 
-				sprintf (filename, "/dev_hdd0/tmp/ps2_emu_%X.self", fw_list[i]);
-				if (file_exists(filename) == SUCCESS) unlink_secure(filename);
-				sprintf (filename, "/dev_hdd0/tmp/ps2_gxemu_%X.self", fw_list[i]);
-				if (file_exists(filename) == SUCCESS) unlink_secure(filename);
-				sprintf (filename, "/dev_hdd0/tmp/ps2_netemu_%X.self", fw_list[i]);
-				if (file_exists(filename) == SUCCESS) unlink_secure(filename);
-			}
-			n += sprintf(&buf[n],"Success: MAMBA/PRX Autoloader uninstalled\r\n");
-			return SUCCESS;
 		}
 		else
 		{
@@ -324,6 +308,26 @@ int run_uninstall_autoloader()
 		n += sprintf(&buf[n],"Error: /dev_blind not mounted\r\n");
 		return FAILED;
 	}
+	//Remove payload and residual ps2emu
+residual:
+
+	for (i = 0; i < 33; i++)
+	{
+		if (fw_list[i] == 0) break;
+		sprintf (filename, "/dev_blind/sys/internal/mpl_payload_%X.bin", fw_list[i]);
+		if (file_exists(filename) == SUCCESS) unlink_secure(filename);
+		sprintf (filename, "/dev_blind/sys/internal/mamba_%X.bin", fw_list[i]);
+		if (file_exists(filename) == SUCCESS) unlink_secure(filename);
+		//ps2emu
+		sprintf (filename, "/dev_hdd0/tmp/ps2_emu_%X.self", fw_list[i]);
+		if (file_exists(filename) == SUCCESS) unlink_secure(filename);
+		sprintf (filename, "/dev_hdd0/tmp/ps2_gxemu_%X.self", fw_list[i]);
+		if (file_exists(filename) == SUCCESS) unlink_secure(filename);
+		sprintf (filename, "/dev_hdd0/tmp/ps2_netemu_%X.self", fw_list[i]);
+		if (file_exists(filename) == SUCCESS) unlink_secure(filename);
+	}
+	n += sprintf(&buf[n],"Success: MAMBA/PRX Autoloader uninstalled\r\n");
+	return SUCCESS;
 }
 
 int run_install_autoloader()
