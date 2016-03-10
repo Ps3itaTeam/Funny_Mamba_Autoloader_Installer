@@ -16,7 +16,6 @@
 #include "exit_png_bin.h"
 #include "install_png_bin.h"
 #include "uninstall_png_bin.h"
-#include "buttons_png_bin.h"
 
 pngData file_Png[6];
 u32 file_Png_offset[6];  
@@ -205,7 +204,6 @@ void Load_PNG()
     pngLoadFromBuffer(exit_png_bin, exit_png_bin_size,   &file_Png[3]);
     pngLoadFromBuffer(install_png_bin, install_png_bin_size,   &file_Png[4]);
     pngLoadFromBuffer(uninstall_png_bin, uninstall_png_bin_size,   &file_Png[5]);
-    pngLoadFromBuffer(buttons_png_bin, buttons_png_bin_size,     &file_Png[6]);
 }
 
 void LoadTexture()
@@ -227,7 +225,7 @@ void LoadTexture()
     
     Load_PNG();
 
-    for(i = 0; i < 7; i++) {
+    for(i = 0; i < 6; i++) {
        
         file_Png_offset[i]   = 0;
        

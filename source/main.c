@@ -17,11 +17,13 @@
 ***/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h> 
 
 #include <sys/file.h>
 #include <sys/process.h>
 #include <io/pad.h>
+#include <sysutil/sysutil.h>
 
 #include <sysmodule/sysmodule.h>
 #include <pngdec/pngdec.h>
@@ -42,7 +44,6 @@
 #define exit		3
 #define install		4
 #define uninstall	5
-#define buttons		6
 
 extern pngData file_Png[6];
 extern u32 file_Png_offset[6];
@@ -53,17 +54,6 @@ int mamba;
 int destroy_world = NO;
 int screen = 0;
 int reboot = NO;
-
-void exiting()
-{
-    sysModuleUnload(SYSMODULE_PNGDEC);
-    ioPadEnd();
-    if(reboot == YES)
-    {
-		sysLv2FsUnlink("/dev_hdd0/tmp/turnoff");
-		lv2syscall3(379, 0x1200, 0, 0);
-	}
-}
 
 int bye = NO;
 int frame = 0;
@@ -174,6 +164,19 @@ int layer1[LINE][COL] =
 	666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666,666
 };
 
+int exiting()
+{
+	sysUtilUnregisterCallback(0);
+    sysModuleUnload(SYSMODULE_PNGDEC);
+    ioPadEnd();
+    if(reboot == YES)
+    {
+		sysLv2FsUnlink("/dev_hdd0/tmp/turnoff");
+		lv2syscall3(379, 0x1200, 0, 0);
+	}
+	return 0;
+}
+
 void draw_layer1()
 {
 	int wx, hy;
@@ -247,6 +250,8 @@ extern char buf[2048];
 
 void draw_log()
 {
+	sysUtilCheckCallback();
+	
 	Draw_background(0x000000ff);
 	SetFontAutoCenter(0);
 	SetCurrentFont(1);
@@ -788,9 +793,6 @@ void collision_character()
 					stat_mov = WALK;
 					vel_jump = JUMP_FORCE;
 				}
-			//	layer1[(int)(BottomRightY/T_WIDTH)][(int)(BottomRightX/T_WIDTH)] = BG;
-			//	layer1[(int)(BottomRightY/T_WIDTH)][(int)(BottomRightX/T_WIDTH + 1)] = BG;
-			//	layer1[(int)(BottomRightY/T_WIDTH)][(int)(BottomRightX/T_WIDTH + 2)] = BG;
 			}
 			break;
 		default:
@@ -817,9 +819,15 @@ int frequency_of_primes (int n)
 	return freq;
 }
 
+void sys_util_call_back(u64 status, u64 param, void *usrdata)
+{
+	if(status == SYSUTIL_EXIT_GAME)
+		exiting();
+}
+
 s32 main(s32 argc, const char* argv[])
 {
-	atexit(exiting);
+	sysUtilRegisterCallback(0, sys_util_call_back, NULL);
 	sysModuleLoad(SYSMODULE_PNGDEC);
 	
 	tiny3d_Init(1024*1024);
@@ -942,6 +950,8 @@ s32 main(s32 argc, const char* argv[])
 		frame++;
 		tiny3d_Flip();	
 	}
+	
+	exiting();
 	return 0;
 }
 
